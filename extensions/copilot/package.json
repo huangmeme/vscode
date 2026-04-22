@@ -1833,6 +1833,91 @@
 				}
 			},
 			{
+				"vendor": "zhipu",
+				"displayName": "Zhipu",
+				"configuration": {
+					"properties": {
+						"apiKey": {
+							"type": "string",
+							"secret": true,
+							"description": "API key for Zhipu",
+							"title": "API Key"
+						}
+					},
+					"required": [
+						"apiKey"
+					]
+				}
+			},
+			{
+				"vendor": "tencentcodingplan",
+				"displayName": "Tencent Coding Plan",
+				"configuration": {
+					"properties": {
+						"apiKey": {
+							"type": "string",
+							"secret": true,
+							"description": "API key for Tencent Coding Plan (sk-sp-xxxx)",
+							"title": "API Key"
+						}
+					},
+					"required": [
+						"apiKey"
+					]
+				}
+			},
+			{
+				"vendor": "aliyuncodingplan",
+				"displayName": "Aliyun Coding Plan",
+				"configuration": {
+					"properties": {
+						"apiKey": {
+							"type": "string",
+							"secret": true,
+							"description": "API key for Aliyun Coding Plan (sk-xxxx)",
+							"title": "API Key"
+						}
+					},
+					"required": [
+						"apiKey"
+					]
+				}
+			},
+			{
+				"vendor": "kimi",
+				"displayName": "Kimi",
+				"configuration": {
+					"properties": {
+						"apiKey": {
+							"type": "string",
+							"secret": true,
+							"description": "API key for Kimi (Moonshot)",
+							"title": "API Key"
+						}
+					},
+					"required": [
+						"apiKey"
+					]
+				}
+			},
+			{
+				"vendor": "deepseek",
+				"displayName": "DeepSeek",
+				"configuration": {
+					"properties": {
+						"apiKey": {
+							"type": "string",
+							"secret": true,
+							"description": "API key for DeepSeek",
+							"title": "API Key"
+						}
+					},
+					"required": [
+						"apiKey"
+					]
+				}
+			},
+			{
 				"vendor": "customoai",
 				"when": "productQualityType != 'stable'",
 				"displayName": "OpenAI Compatible",

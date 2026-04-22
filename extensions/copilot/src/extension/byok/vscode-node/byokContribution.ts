@@ -12,15 +12,20 @@ import { Disposable } from '../../../util/vs/base/common/lifecycle';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
 import { BYOKKnownModels, isBYOKEnabled } from '../../byok/common/byokProvider';
 import { IExtensionContribution } from '../../common/contributions';
+import { AliyunCodingPlanLMProvider } from './aliyunCodingPlanProvider';
 import { AnthropicLMProvider } from './anthropicProvider';
 import { AzureBYOKModelProvider } from './azureProvider';
 import { BYOKStorageService, IBYOKStorageService } from './byokStorageService';
 import { CustomOAIBYOKModelProvider } from './customOAIProvider';
+import { DeepSeekLMProvider } from './deepseekProvider';
 import { GeminiNativeBYOKLMProvider } from './geminiNativeProvider';
+import { KimiLMProvider } from './kimiProvider';
 import { OllamaLMProvider } from './ollamaProvider';
 import { OAIBYOKLMProvider } from './openAIProvider';
 import { OpenRouterLMProvider } from './openRouterProvider';
+import { TencentCodingPlanLMProvider } from './tencentCodingPlanProvider';
 import { XAIBYOKLMProvider } from './xAIProvider';
+import { ZhipuLMProvider } from './zhipuProvider';
 
 export class BYOKContrib extends Disposable implements IExtensionContribution {
 	public readonly id: string = 'byok-contribution';
@@ -61,6 +66,11 @@ export class BYOKContrib extends Disposable implements IExtensionContribution {
 			this._providers.set(OpenRouterLMProvider.providerName.toLowerCase(), instantiationService.createInstance(OpenRouterLMProvider, this._byokStorageService));
 			this._providers.set(AzureBYOKModelProvider.providerName.toLowerCase(), instantiationService.createInstance(AzureBYOKModelProvider, this._byokStorageService));
 			this._providers.set(CustomOAIBYOKModelProvider.providerName.toLowerCase(), instantiationService.createInstance(CustomOAIBYOKModelProvider, this._byokStorageService));
+			this._providers.set(ZhipuLMProvider.providerName.toLowerCase(), instantiationService.createInstance(ZhipuLMProvider, this._byokStorageService));
+			this._providers.set(TencentCodingPlanLMProvider.providerName.toLowerCase(), instantiationService.createInstance(TencentCodingPlanLMProvider, this._byokStorageService));
+			this._providers.set(AliyunCodingPlanLMProvider.providerName.toLowerCase(), instantiationService.createInstance(AliyunCodingPlanLMProvider, this._byokStorageService));
+			this._providers.set(KimiLMProvider.providerName.toLowerCase(), instantiationService.createInstance(KimiLMProvider, this._byokStorageService));
+			this._providers.set(DeepSeekLMProvider.providerName.toLowerCase(), instantiationService.createInstance(DeepSeekLMProvider, this._byokStorageService));
 
 			for (const [providerName, provider] of this._providers) {
 				this._store.add(lm.registerLanguageModelChatProvider(providerName, provider));
