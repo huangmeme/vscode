@@ -1,0 +1,44 @@
+name: Build Copilot VSIX
+
+on:
+  push:
+    tags:
+      - 'copilot/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: extensions/copilot/.nvmrc
+          cache: npm
+          cache-dependency-path: extensions/copilot/package-lock.json
+
+      - name: Install dependencies
+        working-directory: extensions/copilot
+        run: npm ci
+
+      - name: Build
+        working-directory: extensions/copilot
+        run: npm run build
+
+      - name: Package VSIX
+        working-directory: extensions/copilot
+        run: npx vsce package -o copilot-chat.vsix
+
+      - name: Upload VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: copilot-chat
+          path: extensions/copilot/copilot-chat.vsix
