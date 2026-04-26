@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import Anthropic from '@anthropic-ai/sdk';
+import { MessageParam } from '@anthropic-ai/sdk/resources';
 import { CancellationToken, LanguageModelChatMessage, LanguageModelDataPart, LanguageModelResponsePart2, LanguageModelTextPart, LanguageModelThinkingPart, LanguageModelToolCallPart, Progress, ProvideLanguageModelChatResponseOptions } from 'vscode';
 import { CustomDataPartMimeTypes } from '../../../platform/endpoint/common/endpointTypes';
 import { buildToolInputSchema } from '../../../platform/endpoint/node/messagesApi';
@@ -66,6 +67,14 @@ export abstract class AbstractAnthropicCompatibleLMProvider extends AbstractLang
 		const tools = this._buildAnthropicTools(options.tools);
 
 		const thinkingConfig = this._getThinkingConfig(model.id, model.maxOutputTokens);
+
+		// Safety net: some Anthropic-compatible APIs (e.g., DeepSeek) require thinking blocks
+		// in ALL assistant messages when thinking mode is enabled. If thinking was lost during
+		// the round-trip (e.g., metadata stripped across IPC), inject placeholder thinking blocks
+		// to prevent 400 errors.
+		if (thinkingConfig) {
+			this._ensureThinkingBlocks(convertedMessages, messages as LanguageModelChatMessage[]);
+		}
 
 		const params: Anthropic.Messages.MessageCreateParamsStreaming = {
 			model: model.id,
@@ -148,6 +157,18 @@ export abstract class AbstractAnthropicCompatibleLMProvider extends AbstractLang
 	 */
 	protected _getThinkingBudget(_modelId: string, _maxOutputTokens: number): number {
 		return 10000;
+	}
+
+	/**
+	 * Ensure all assistant messages have at least one thinking block when thinking mode is enabled.
+	 * No-op by default. Providers that require thinking blocks in all assistant messages
+	 * (e.g., DeepSeek) should override this method.
+	 */
+	protected _ensureThinkingBlocks(
+		_convertedMessages: MessageParam[],
+		_originalMessages: LanguageModelChatMessage[],
+	): void {
+		// No-op by default
 	}
 
 	protected async _makeRequest(
@@ -243,14 +264,15 @@ export abstract class AbstractAnthropicCompatibleLMProvider extends AbstractLang
 						}
 						pendingToolCall = undefined;
 					} else if (pendingThinking) {
-						if (pendingThinking.signature) {
-							const finalThinkingPart = new LanguageModelThinkingPart('');
-							finalThinkingPart.metadata = {
-								signature: pendingThinking.signature,
-								_completeThinking: pendingThinking.thinking,
-							};
-							progress.report(finalThinkingPart);
-						}
+						const finalThinkingPart = new LanguageModelThinkingPart(
+							pendingThinking.thinking || '',
+							undefined,
+							{
+								signature: pendingThinking.signature || '',
+								_completeThinking: pendingThinking.thinking || '',
+							}
+						);
+						progress.report(finalThinkingPart);
 						pendingThinking = undefined;
 					}
 				}
